@@ -97,3 +97,160 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS "TPC-H".part
     OWNER to postgres;
 ```
+
+```pgsql supplier
+-- Table: TPC-H.supplier
+
+-- DROP TABLE IF EXISTS "TPC-H".supplier;
+
+CREATE TABLE IF NOT EXISTS "TPC-H".supplier
+(
+    s_suppkey integer NOT NULL,
+    s_name character(25) COLLATE pg_catalog."default" NOT NULL,
+    s_address character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    s_nationkey integer NOT NULL,
+    s_phone character(15) COLLATE pg_catalog."default" NOT NULL,
+    s_acctbal numeric(15,2) NOT NULL,
+    s_comment character varying(101) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT supplier_pkey PRIMARY KEY (s_suppkey),
+    CONSTRAINT fk_supplier FOREIGN KEY (s_nationkey)
+        REFERENCES "TPC-H".nation (n_nationkey) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS "TPC-H".supplier
+    OWNER to postgres;
+```
+
+```pgsql partsupp
+-- Table: TPC-H.partsupp
+
+DROP TABLE IF EXISTS "TPC-H".partsupp;
+
+CREATE TABLE IF NOT EXISTS "TPC-H".partsupp
+(
+    ps_partkey integer NOT NULL,
+    ps_suppkey integer NOT NULL,
+    ps_availqty integer NOT NULL,
+    ps_supplycost numeric(15,2) NOT NULL,
+    ps_comment character varying(199) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT partsupp_pkey PRIMARY KEY (ps_partkey, ps_suppkey),
+    CONSTRAINT fk_ps_suppkey_partkey FOREIGN KEY (ps_partkey)
+        REFERENCES "TPC-H".part (p_partkey) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+	CONSTRAINT fk_ps_suppkey_suppkey FOREIGN KEY (ps_suppkey)
+		REFERENCES "TPC-H".supplier (s_suppkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS "TPC-H".partsupp
+    OWNER to postgres;
+```
+
+```pgsql customer
+-- Table: TPC-H.customer
+
+-- DROP TABLE IF EXISTS "TPC-H".customer;
+
+CREATE TABLE IF NOT EXISTS "TPC-H".customer
+(
+    c_custkey integer NOT NULL,
+    c_name character varying(25) COLLATE pg_catalog."default" NOT NULL,
+    c_address character varying(40) COLLATE pg_catalog."default" NOT NULL,
+    c_nationkey integer NOT NULL,
+    c_phone character(15) COLLATE pg_catalog."default" NOT NULL,
+    c_acctbal numeric(15,2) NOT NULL,
+    c_mktsegment character(10) COLLATE pg_catalog."default" NOT NULL,
+    c_comment character varying(117) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT customer_pkey PRIMARY KEY (c_custkey),
+	CONSTRAINT fk_customer FOREIGN KEY (c_nationkey)
+		REFERENCES "TPC-H".nation (n_nationkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS "TPC-H".customer
+    OWNER to postgres;
+```
+
+```pgsql orders
+-- Table: TPC-H.orders
+
+-- DROP TABLE IF EXISTS "TPC-H".orders;
+
+CREATE TABLE IF NOT EXISTS "TPC-H".orders
+(
+    o_orderkey integer NOT NULL,
+    o_custkey integer NOT NULL,
+    o_orderstatus character(1) COLLATE pg_catalog."default" NOT NULL,
+    o_totalprice numeric(15,2) NOT NULL,
+    o_orderdate date NOT NULL,
+    o_orderpriority character(15) COLLATE pg_catalog."default" NOT NULL,
+    o_clerk character(15) COLLATE pg_catalog."default" NOT NULL,
+    o_shippriority integer NOT NULL,
+    o_comment character varying(79) COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT orders_pkey PRIMARY KEY (o_orderkey),
+	CONSTRAINT fk_orders FOREIGN KEY (o_custkey)
+		REFERENCES "TPC-H".customer (c_custkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS "TPC-H".orders
+    OWNER to postgres;
+```
+
+```pgsql lineitem
+-- Table: TPC-H.lineitem
+
+-- DROP TABLE IF EXISTS "TPC-H".lineitem;
+
+CREATE TABLE IF NOT EXISTS "TPC-H".lineitem
+(
+    l_orderkey integer NOT NULL,
+    l_partkey integer NOT NULL,
+    l_suppkey integer NOT NULL,
+    l_linenumber integer NOT NULL,
+    l_quantity numeric(15,2) NOT NULL,
+    l_extendedprice numeric(15,2) NOT NULL,
+    l_discount numeric(15,2) NOT NULL,
+    l_tax numeric(15,2) NOT NULL,
+    l_returnflag character(1) COLLATE pg_catalog."default" NOT NULL,
+    l_linestatus character(1) COLLATE pg_catalog."default" NOT NULL,
+    l_shipdate date NOT NULL,
+    l_commitdate date NOT NULL,
+    l_receiptdate date NOT NULL,
+    l_shipinstruct character(25) COLLATE pg_catalog."default" NOT NULL,
+    l_shipmode character(10) COLLATE pg_catalog."default" NOT NULL,
+    l_comment character varying(44) COLLATE pg_catalog."default" NOT NULL,
+	CONSTRAINT lineitem_pkey PRIMARY KEY (l_orderkey, l_partkey, l_suppkey, l_linenumber),
+	CONSTRAINT fk_lineitem_orderkey FOREIGN KEY (l_orderkey)
+		REFERENCES "TPC-H".orders (o_orderkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT fk_lineitem_partkey FOREIGN KEY (l_partkey)
+		REFERENCES "TPC-H".part (p_partkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION,
+	CONSTRAINT fk_lineitem_suppkey FOREIGN KEY (l_suppkey)
+		REFERENCES "TPC-H".supplier (s_suppkey) MATCH SIMPLE
+		ON UPDATE NO ACTION
+		ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS "TPC-H".lineitem
+    OWNER to postgres;
+```

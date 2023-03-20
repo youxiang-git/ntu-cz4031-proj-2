@@ -14,19 +14,19 @@ psql
 
 2. Create a new database / schema:
 
-```pgsql
+```postgresql
 create schema "TPC-H";
 ```
 
 3. Set search path to TPC-H
 
-```pgsql
+```postgresql
 set search_path to "TPC-H";
 ```
 
 4. Create the empty relations / tables
 
-```pgsql region
+```postgresql region
 -- Table: TPC-H.region
 
 -- DROP TABLE IF EXISTS "TPC-H".region;
@@ -45,7 +45,7 @@ ALTER TABLE IF EXISTS "TPC-H".region
     OWNER to postgres;
 ```
 
-```pgsql nation
+```postgresql nation
 -- Table: TPC-H.nation
 
 -- DROP TABLE IF EXISTS "TPC-H".nation;
@@ -73,7 +73,7 @@ ALTER TABLE IF EXISTS "TPC-H".nation
     OWNER to postgres;
 ```
 
-```pgsql part
+```postgresql part
 -- Table: TPC-H.part
 
 -- DROP TABLE IF EXISTS "TPC-H".part;
@@ -98,7 +98,7 @@ ALTER TABLE IF EXISTS "TPC-H".part
     OWNER to postgres;
 ```
 
-```pgsql supplier
+```postgresql supplier
 -- Table: TPC-H.supplier
 
 -- DROP TABLE IF EXISTS "TPC-H".supplier;
@@ -125,7 +125,7 @@ ALTER TABLE IF EXISTS "TPC-H".supplier
     OWNER to postgres;
 ```
 
-```pgsql partsupp
+```postgresql partsupp
 -- Table: TPC-H.partsupp
 
 DROP TABLE IF EXISTS "TPC-H".partsupp;
@@ -154,7 +154,7 @@ ALTER TABLE IF EXISTS "TPC-H".partsupp
     OWNER to postgres;
 ```
 
-```pgsql customer
+```postgresql customer
 -- Table: TPC-H.customer
 
 -- DROP TABLE IF EXISTS "TPC-H".customer;
@@ -182,7 +182,7 @@ ALTER TABLE IF EXISTS "TPC-H".customer
     OWNER to postgres;
 ```
 
-```pgsql orders
+```postgresql orders
 -- Table: TPC-H.orders
 
 -- DROP TABLE IF EXISTS "TPC-H".orders;
@@ -211,7 +211,7 @@ ALTER TABLE IF EXISTS "TPC-H".orders
     OWNER to postgres;
 ```
 
-```pgsql lineitem
+```postgresql lineitem
 -- Table: TPC-H.lineitem
 
 -- DROP TABLE IF EXISTS "TPC-H".lineitem;
@@ -258,6 +258,7 @@ ALTER TABLE IF EXISTS "TPC-H".lineitem
 5. Import the data into the database
 
 #### Before importing, run the following regex script in a terminal to remove the extra '|' character as mentioned in the brief
+
 <u>Please make sure you're in the directory where the .tbl files are located.</u>
 
 ```bash
@@ -266,7 +267,7 @@ for i in `ls *.tbl`; do sed 's/|$//' $i > ${i/tbl/csv}; echo $i; done;
 
 #### IMPORTANT! Replace 'tbl\\\*.csv' with the path to the files on your computer
 
-```pgsql
+```postgresql
 \copy "region"     from 'tbl\region.csv'      DELIMITER '|' CSV;
 \copy "nation"     from 'tbl\nation.csv'      DELIMITER '|' CSV;
 \copy "part"       from 'tbl\part.csv'        DELIMITER '|' CSV;

@@ -254,3 +254,25 @@ TABLESPACE pg_default;
 ALTER TABLE IF EXISTS "TPC-H".lineitem
     OWNER to postgres;
 ```
+
+5. Import the data into the database
+
+#### Before importing, run the following regex script in a terminal to remove the extra '|' character as mentioned in the brief
+<u>Please make sure you're in the directory where the .tbl files are located.</u>
+
+```bash
+for i in `ls *.tbl`; do sed 's/|$//' $i > ${i/tbl/csv}; echo $i; done;
+```
+
+#### IMPORTANT! Replace 'tbl\\\*.csv' with the path to the files on your computer
+
+```pgsql
+\copy "region"     from 'tbl\region.csv'      DELIMITER '|' CSV;
+\copy "nation"     from 'tbl\nation.csv'      DELIMITER '|' CSV;
+\copy "part"       from 'tbl\part.csv'        DELIMITER '|' CSV;
+\copy "supplier"   from 'tbl\supplier.csv'    DELIMITER '|' CSV;
+\copy "partsupp"   from 'tbl\partsupp.csv'    DELIMITER '|' CSV;
+\copy "customer"   from 'tbl\customer.csv'    DELIMITER '|' CSV;
+\copy "orders"     from 'tbl\orders.csv'      DELIMITER '|' CSV;
+\copy "lineitem"   from 'tbl\lineitem.csv'    DELIMITER '|' CSV;
+```

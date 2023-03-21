@@ -1,37 +1,3 @@
-# CZ4031 Project 2
-
-## How to import files to PostgreSQL
-
-Ensure that you have PostgreSQL installed and have obtained the generated tbl files from dbgen.
-
-1. Connect to your PostgreSQL database, it is recommended to use SQL shell (psql).
-
-    Or in any terminal, type:
-
-```bash
-psql
-```
-
-2. Create a new database / schema:
-
-```postgresql
-create schema "TPC-H";
-```
-
-3. Set search path to TPC-H
-
-```postgresql
-set search_path to "TPC-H";
-```
-
-4. Create the empty relations / tables using the SQL commands below, or just execute `create_tables.sql` in the correct folder
-
-```postgresql
-\i create_tables.sql
-```
-OR
-
-```postgresql region
 -- Table: TPC-H.region
 
 -- DROP TABLE IF EXISTS "TPC-H".region;
@@ -48,9 +14,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".region
     OWNER to postgres;
-```
 
-```postgresql nation
+
 -- Table: TPC-H.nation
 
 -- DROP TABLE IF EXISTS "TPC-H".nation;
@@ -76,9 +41,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".nation
     OWNER to postgres;
-```
 
-```postgresql part
+
 -- Table: TPC-H.part
 
 -- DROP TABLE IF EXISTS "TPC-H".part;
@@ -101,9 +65,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".part
     OWNER to postgres;
-```
 
-```postgresql supplier
+
 -- Table: TPC-H.supplier
 
 -- DROP TABLE IF EXISTS "TPC-H".supplier;
@@ -128,12 +91,11 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".supplier
     OWNER to postgres;
-```
 
-```postgresql partsupp
+
 -- Table: TPC-H.partsupp
 
-DROP TABLE IF EXISTS "TPC-H".partsupp;
+-- DROP TABLE IF EXISTS "TPC-H".partsupp;
 
 CREATE TABLE IF NOT EXISTS "TPC-H".partsupp
 (
@@ -157,9 +119,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".partsupp
     OWNER to postgres;
-```
 
-```postgresql customer
+
 -- Table: TPC-H.customer
 
 -- DROP TABLE IF EXISTS "TPC-H".customer;
@@ -185,9 +146,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".customer
     OWNER to postgres;
-```
 
-```postgresql orders
+
 -- Table: TPC-H.orders
 
 -- DROP TABLE IF EXISTS "TPC-H".orders;
@@ -214,9 +174,8 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".orders
     OWNER to postgres;
-```
 
-```postgresql lineitem
+
 -- Table: TPC-H.lineitem
 
 -- DROP TABLE IF EXISTS "TPC-H".lineitem;
@@ -258,35 +217,3 @@ TABLESPACE pg_default;
 
 ALTER TABLE IF EXISTS "TPC-H".lineitem
     OWNER to postgres;
-```
-
-5. Import the data into the database
-
-#### Before importing, run the following regex script in a terminal to remove the extra '|' character as mentioned in the brief
-
-<u>Please make sure you're in the directory where the .tbl files are located.</u>
-
-```bash
-for i in `ls *.tbl`; do sed 's/|$//' $i > ${i/tbl/csv}; echo $i; done;
-```
-
-#### IMPORTANT! Replace 'tbl\\\*.csv' with the path to the files on your computer
-
-```postgresql
-\copy "region"     from 'tbl\region.csv'      DELIMITER '|' CSV;
-\copy "nation"     from 'tbl\nation.csv'      DELIMITER '|' CSV;
-\copy "part"       from 'tbl\part.csv'        DELIMITER '|' CSV;
-\copy "supplier"   from 'tbl\supplier.csv'    DELIMITER '|' CSV;
-\copy "partsupp"   from 'tbl\partsupp.csv'    DELIMITER '|' CSV;
-\copy "customer"   from 'tbl\customer.csv'    DELIMITER '|' CSV;
-\copy "orders"     from 'tbl\orders.csv'      DELIMITER '|' CSV;
-\copy "lineitem"   from 'tbl\lineitem.csv'    DELIMITER '|' CSV;
-```
-
-## How to set up PostgreSQL in Python
-Install [psycopg2](https://www.psycopg.org/docs/install.html#quick-install), a PostgreSQL adapter for the Python programming language 
-``` bash 
-pip install psycopg2-binary
-```
-
-In [`explain.py`](/explain.py), change the database connection parameters in the `StartDBConnection()` method to your local configuration if needed. (There is probably a better way to do this)

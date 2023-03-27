@@ -4,6 +4,10 @@
     "Parallel Aware": false,
     "Async Capable": false,
     "Join Type": "Inner",
+    "Startup Cost": 13.82,
+    "Total Cost": 25.98,
+    "Plan Rows": 170,
+    "Plan Width": 864,
     "Inner Unique": true,
     "Hash Cond": "(n.n_regionkey = r.r_regionkey)",
     "Plans": [
@@ -13,13 +17,21 @@
         "Parallel Aware": false,
         "Async Capable": false,
         "Relation Name": "nation",
-        "Alias": "n"
+        "Alias": "n",
+        "Startup Cost": 0.0,
+        "Total Cost": 11.7,
+        "Plan Rows": 170,
+        "Plan Width": 434
       },
       {
         "Node Type": "Hash",
         "Parent Relationship": "Inner",
         "Parallel Aware": false,
         "Async Capable": false,
+        "Startup Cost": 11.7,
+        "Total Cost": 11.7,
+        "Plan Rows": 170,
+        "Plan Width": 430,
         "Plans": [
           {
             "Node Type": "Seq Scan",
@@ -27,7 +39,11 @@
             "Parallel Aware": false,
             "Async Capable": false,
             "Relation Name": "region",
-            "Alias": "r"
+            "Alias": "r",
+            "Startup Cost": 0.0,
+            "Total Cost": 11.7,
+            "Plan Rows": 170,
+            "Plan Width": 430
           }
         ]
       }
@@ -38,6 +54,10 @@
     "Parallel Aware": false,
     "Async Capable": false,
     "Join Type": "Inner",
+    "Startup Cost": 12.14,
+    "Total Cost": 24.29,
+    "Plan Rows": 1,
+    "Plan Width": 864,
     "Inner Unique": true,
     "Hash Cond": "(n.n_regionkey = r.r_regionkey)",
     "Plans": [
@@ -47,13 +67,21 @@
         "Parallel Aware": false,
         "Async Capable": false,
         "Relation Name": "nation",
-        "Alias": "n"
+        "Alias": "n",
+        "Startup Cost": 0.0,
+        "Total Cost": 11.7,
+        "Plan Rows": 170,
+        "Plan Width": 434
       },
       {
         "Node Type": "Hash",
         "Parent Relationship": "Inner",
         "Parallel Aware": false,
         "Async Capable": false,
+        "Startup Cost": 12.13,
+        "Total Cost": 12.13,
+        "Plan Rows": 1,
+        "Plan Width": 430,
         "Plans": [
           {
             "Node Type": "Seq Scan",
@@ -62,6 +90,10 @@
             "Async Capable": false,
             "Relation Name": "region",
             "Alias": "r",
+            "Startup Cost": 0.0,
+            "Total Cost": 12.13,
+            "Plan Rows": 1,
+            "Plan Width": 430,
             "Filter": "(r_name = 'ASIA'::bpchar)"
           }
         ]

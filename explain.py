@@ -20,6 +20,16 @@ def GetQueryPlan(query):
     with db_conn.cursor() as cur:
         cur.execute(explain_query)
         return cur.fetchall()[0][0][0].get("Plan") # PROBABLY NEED TO FORMAT THIS PROPERLY
+    
+def GetAllNodes(query, indent):
+
+    for k, v in query.items():
+        if type(v) == str:
+            print(indent*"\t" + v)
+        
+        if k == "Plans":
+            for item in v:
+                GetAllNodes(item, indent+1)
 
 def CompareQueries(query1, query2):
     plan1 = GetQueryPlan(query1)
@@ -28,13 +38,15 @@ def CompareQueries(query1, query2):
     output_file = open("output.json", "w")
     json.dump([plan1, plan2], output_file, indent=2)
     output_file.close()
-     
-    plan1_json = json.dumps(plan1, indent=2)
-    plan2_json = json.dumps(plan2, indent=2)
     
-    print("PLAN 1\n----")
-    print(plan1_json)
-    print("\n----")
-    print("PLAN 2\n----")
-    print(plan2_json)
-    print("\n----")
+    GetAllNodes(plan1, 0)
+    print("\n\n")
+    GetAllNodes(plan2, 0)
+
+
+    # print("PLAN 1\n----")
+    # print(plan1_json)
+    # print("\n----")
+    # print("PLAN 2\n----")
+    # print(plan2_json)
+    # print("\n----")

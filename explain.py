@@ -1,4 +1,5 @@
 import psycopg2
+import json
 
 def StartDBConnection():
     conn = None
@@ -22,11 +23,18 @@ def GetQueryPlan(query):
 
 def CompareQueries(query1, query2):
     plan1 = GetQueryPlan(query1)
-    plan2 =GetQueryPlan(query2)
+    plan2 = GetQueryPlan(query2)
 
+    output_file = open("output.json", "w")
+    json.dump([plan1, plan2], output_file, indent=2)
+    output_file.close()
+     
+    plan1_json = json.dumps(plan1, indent=2)
+    plan2_json = json.dumps(plan2, indent=2)
+    
     print("PLAN 1\n----")
-    print(plan1)
+    print(plan1_json)
     print("\n----")
     print("PLAN 2\n----")
-    print(plan2)
+    print(plan2_json)
     print("\n----")

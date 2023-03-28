@@ -32,6 +32,10 @@ def GetAllNodes(query, indent):
                 GetAllNodes(item, indent+1)
 
 def CompareQueries(query1, query2):
+    if query1 == query2:
+        print("There are no differences between the queries, please check your input.")
+        return
+
     plan1 = GetQueryPlan(query1)
     plan2 = GetQueryPlan(query2)
 

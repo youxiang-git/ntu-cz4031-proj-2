@@ -1,0 +1,87 @@
+[
+  [
+    [
+      "Gather  (cost=5366.42..39614.55 rows=2 width=127)"
+    ],
+    [
+      "  Workers Planned: 2"
+    ],
+    [
+      "  ->  Nested Loop  (cost=4366.42..38614.35 rows=1 width=127)"
+    ],
+    [
+      "        ->  Parallel Hash Join  (cost=4366.26..38606.16 rows=1 width=27)"
+    ],
+    [
+      "              Hash Cond: (o.o_custkey = c.c_custkey)"
+    ],
+    [
+      "              ->  Parallel Seq Scan on orders o  (cost=0.00..33907.50 rows=126625 width=8)"
+    ],
+    [
+      "                    Filter: (o_orderpriority = '1-URGENT'::bpchar)"
+    ],
+    [
+      "              ->  Parallel Hash  (cost=4366.25..4366.25 rows=1 width=27)"
+    ],
+    [
+      "                    ->  Parallel Seq Scan on customer c  (cost=0.00..4366.25 rows=1 width=27)"
+    ],
+    [
+      "                          Filter: ((c_name)::text = 'Customer#000000316'::text)"
+    ],
+    [
+      "        ->  Memoize  (cost=0.15..8.17 rows=1 width=108)"
+    ],
+    [
+      "              Cache Key: c.c_nationkey"
+    ],
+    [
+      "              Cache Mode: logical"
+    ],
+    [
+      "              ->  Index Scan using nation_pkey on nation n  (cost=0.14..8.16 rows=1 width=108)"
+    ],
+    [
+      "                    Index Cond: (n_nationkey = c.c_nationkey)"
+    ]
+  ],
+  [
+    [
+      "Gather  (cost=5380.09..39366.77 rows=10 width=127)"
+    ],
+    [
+      "  Workers Planned: 2"
+    ],
+    [
+      "  ->  Hash Join  (cost=4380.09..38365.77 rows=4 width=127)"
+    ],
+    [
+      "        Hash Cond: (c.c_nationkey = n.n_nationkey)"
+    ],
+    [
+      "        ->  Parallel Hash Join  (cost=4366.26..38351.93 rows=4 width=27)"
+    ],
+    [
+      "              Hash Cond: (o.o_custkey = c.c_custkey)"
+    ],
+    [
+      "              ->  Parallel Seq Scan on orders o  (cost=0.00..32345.00 rows=625000 width=8)"
+    ],
+    [
+      "              ->  Parallel Hash  (cost=4366.25..4366.25 rows=1 width=27)"
+    ],
+    [
+      "                    ->  Parallel Seq Scan on customer c  (cost=0.00..4366.25 rows=1 width=27)"
+    ],
+    [
+      "                          Filter: ((c_name)::text = 'Customer#000000316'::text)"
+    ],
+    [
+      "        ->  Hash  (cost=11.70..11.70 rows=170 width=108)"
+    ],
+    [
+      "              ->  Seq Scan on nation n  (cost=0.00..11.70 rows=170 width=108)"
+    ]
+  ]
+]

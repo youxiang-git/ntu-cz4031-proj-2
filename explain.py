@@ -1,8 +1,8 @@
-from pprint import pprint
 import psycopg2
 import json
 import difflib as dl
 import re
+import sqlparse
 
 def StartDBConnection():
     conn = None
@@ -94,38 +94,64 @@ def CompareQueries(query1, query2):
     traverse_qp_json_2(plan1, plan2)
     print('\n')
     print(" ----- Because -----")
+    print('\n')
     # here we compare the differences in the queries
-    # remove all commas and semi-colons so that the printed results look nice
-    q1 = re.sub(r'[,;]', '', query1)
-    q2 = re.sub(r'[,;]', '', query2)
-    matcher = dl.SequenceMatcher(lambda x: x == ",", q1, q2)
+    q1 = sqlparse.format(query1, keyword_case='upper', strip_comments=True)
+    q2 = sqlparse.format(query2, keyword_case='upper', strip_comments=True)
 
-    same = []
+    q1_keywords = []
+    q2_keywords = []
+
+    q1_parsed = sqlparse.parse(q1)[0]
+    q2_parsed = sqlparse.parse(q2)[0]
+
+    # q1_split = [token.value for token in q1_parsed.tokens if token.ttype is not sqlparse.tokens.Whitespace]
+    # q2_split = [token.value for token in q2_parsed.tokens if token.ttype is not sqlparse.tokens.Whitespace]
+
+    for t in q1_parsed.tokens:
+        if t.ttype is sqlparse.tokens.Keyword or t.value == 'SELECT':
+            q1_keywords.append(t.value.upper())
+        elif t.is_group:
+            for nt in t.tokens:
+                if nt.ttype is sqlparse.tokens.Keyword:
+                    q1_keywords.append(nt.value)
+
+    for t in q2_parsed.tokens:
+        if t.ttype is sqlparse.tokens.Keyword or t.value == 'SELECT':
+            q2_keywords.append(t.value.upper())
+        elif t.is_group:
+            for nt in t.tokens:
+                if nt.ttype is sqlparse.tokens.Keyword:
+                    q2_keywords.append(nt.value)
+        
+    q1 = re.sub(r'[,;]', '', q1)
+    q2 = re.sub(r'[,;]', '', q2)
+    q1 = q1.split()
+    q2 = q2.split()
+
+    matcher = dl.SequenceMatcher(None, q1, q2)
+
+    q1_currClause = 0
+    q2_currClause = 0
 
     for op, i1, i2, j1, j2 in matcher.get_opcodes():
+        for item in q1_keywords:
+            if item in ' '.join(q1[i1:i2]):
+                q1_currClause = item
+        for item in q2_keywords:
+            if item in ' '.join(q2[j1:j2]):
+                q2_currClause = item
         if op == 'replace':
-            for word in same:
-                if word.isupper():
-                    print(word)
-            print("'{q1}' has been modified to '{q2}' under the {clause} clause".format(q1 = q1[i1:i2], q2 = q2[j1:j2], clause = same.pop()))
+            print("'{q1}' has been modified to '{q2}' under the {clause} clause".format(q1 = ' '.join(q1[i1:i2]), q2 = ' '.join(q2[j1:j2]), clause = q1_currClause))
 
         elif op == 'delete':
-            for word in same:
-                if word.isupper():
-                    print(word)
-            print("'{q1}' has deleted under the {clause} clause".format(q1 = q1[i1:i2], clause = same.pop()))
-
-        elif op == 'equal':
-            words = q1[i1:i2].split(' ')
-            for word in words[::-1]:
-                if word.isupper():
-                    same.append(word)
-                    if len(same) == 1:
-                        break
-            
+            q1_string = ' '.join(q1[i1:i2])
+            if q1_currClause in q1_string:
+                q1_string = q1_string.replace(q1_currClause, '').strip()
+            print("'{q1}' under the {clause} clause in original query, has been removed".format(q1 = q1_string, clause = q1_currClause))
             
         elif op == 'insert':
-            for word in same:
-                if word.isupper():
-                    print(word)
-            print("'{q2}' has added under the {clause} clause".format(q2 = q2[j1:j2], clause = same.pop()))
+            q2_string = ' '.join(q2[j1:j2])
+            if q2_currClause in q2_string:
+                q2_string = q2_string.replace(q2_currClause, '').strip()
+            print("'{q2}' has been added to the new query under the {clause} clause".format(q2 = q2_string, clause = q2_currClause))

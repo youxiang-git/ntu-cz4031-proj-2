@@ -1,4 +1,4 @@
-pg_def = {
+pg_operations = {
 	"LIMIT": "returns a specified number of rows from a record set.",
 	"SORT": "sorts a record set based on the specified sort key.",
 	"NESTED LOOP": "merges two record sets by looping through every record in the first set and trying to find a match in the second set. All matching records are returned.",
@@ -16,4 +16,16 @@ pg_def = {
 	"MEMOIZE": "is used to cache the results of the inner side of a nested loop. It avoids executing underlying nodes when the results for the current parameters are already in the cache.",
 	"GATHER": "reads the results of the parallel workers, in an undefined order.",
 	"GATHER MERGE": "reads the results of the parallel workers, preserving any ordering."
+}
+
+node_type_dict = {
+    "Hash Join": "{Join Type}-Hash Join on {Hash Cond}",
+    "Nested Loop": "{Join Type}-Nested-Loop Join ",
+    "Seq Scan": "Sequential Scan on '{Relation Name}' as '{Alias}' ",
+    "Index Scan": "Index Scan on '{Relation Name}' as '{Alias}' on '{Index Name}' ",
+    "Index Only Scan": "Index Only Scan on '{Relation Name}' as '{Alias}' on '{Index Name}' ",
+    "Merge Join": "{Join Type}-Merge Join on {Merge Cond}",
+    "Bitmap Heap Scan": "Bitmap Heap Scan on '{Relation Name}' as '{Alias}' with {Recheck Condition} ",
+    "Bitmap Index Scan": "Bitmap Index Scan on '{Index Name}' with {Index Cond}",
+    "Sort": "Sorted on '{Sort Key}'",
 }

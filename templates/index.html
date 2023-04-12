@@ -5,29 +5,74 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title></title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
 <body class="bg-gray-100">
-    <div class="container mx-auto px-4 py-8">
+    <div x-data="getData()" class="container mx-auto px-4 py-8">
         <h1 class="text-3xl font-semibold mb-6">CZ4031 Project 2</h1>
         <form>
             <div class="grid sm:grid-cols-2 gap-4 mb-4">
                 <div>
                     <label for="query1" class="block text-gray-700 text-sm font-medium mb-2">Query 1</label>
-                    <textarea id="query1" name="query1" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
+                    <textarea x-model="query1" id="query1" name="query1" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
                 </div>
                 <div>
                     <label for="query2" class="block text-gray-700 text-sm font-medium mb-2">Query 2</label>
-                    <textarea id="query2" name="query2" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
+                    <textarea x-model="query2" id="query2" name="query2" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
                 </div>
             </div>
-            <button type="submit" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+            <button @click.prevent="handleSubmit" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Submit</button>
         </form>
         <div class="mt-8 bg-white p-4 rounded border border-gray-300">
-            <h2 class="text-xl font-semibold mb-4">Explanation</h2>
-            <p class="text-gray-700">
-                {{ explanation }}
-            </p>
+            <h2 class="text-xl font-semibold mb-4">Difference in the queries</h2>
+            <p x-text="diff" class="text-gray-700"></p>
+        </div>
+        <div class="grid sm:grid-cols-2 gap-4">
+            <div class="mt-8 bg-white p-4 rounded border border-gray-300">
+                <h2 class="text-xl font-semibold mb-4">Operations in Query 1 & not in Query 2</h2>
+                <p x-text="query1Plan" class="text-gray-700"></p>
+            </div>
+            <div class="mt-8 bg-white p-4 rounded border border-gray-300">
+                <h2 class="text-xl font-semibold mb-4">Operations in Query 2 & not in Query 1</h2>
+                <p x-text="query2Plan" class="text-gray-700"></p>
+            </div>
         </div>
     </div>
 </body>
+<script>
+    const sample_query1 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316' LIMIT 100"
+    const sample_query2 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316';"
+
+    function getData() {
+        return { 
+            query1: sample_query1,
+            query2: sample_query2,
+            diff: '-',
+            query1Plan: '-',
+            query2Plan: '-',
+            handleSubmit() {
+                const res = fetch(`{{ url_for('compare') }}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query1: this.query1,
+                        query2: this.query2,
+                    })
+                }).then(res => {
+                    if (res.status !== 200) {
+                        throw new Error("Error submitting form")
+                    } else {
+                        return res.json()
+                    }
+                }).then(data => {
+                    this.query1Plan = data.query1Plan.length === 0 ? '-' : data.query1Plan
+                    this.query2Plan = data.query2Plan.length === 0 ? '-' : data.query2Plan
+                    this.diff = data.diff.length === 0 ? '-' : data.diff
+                })
+            }
+        }
+    }
+</script>
 </html>

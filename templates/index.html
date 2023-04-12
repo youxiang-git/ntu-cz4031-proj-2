@@ -1,55 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="bg-base-200">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <title>CZ4031 Project 2</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}"><link rel="preconnect" href="https://fonts.googleapis.com">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
-<body class="bg-gray-100">
-    <div x-data="getData()" class="container mx-auto px-4 py-8">
-        <h1 class="text-3xl font-semibold mb-6">CZ4031 Project 2</h1>
-        <form>
-            <div class="grid sm:grid-cols-2 gap-4 mb-4">
+<body>
+    <div x-data="getData()" class="container mx-auto px-4 py-12">
+        <h1 class="text-3xl font-semibold mb-8">CZ4031 Project 2</h1>
+        <form class="grid gap-y-6 mb-10">
+            <select x-model="exampleQuery" @change="updateQueries()" class="select select-bordered max-w-xs">
+                <option value="0">Choose an example</option>
+                <option value="1">Example 1</option>
+                <option value="2">Example 2</option>
+                <option value="3">Example 3</option>
+                <option value="4">Example 4</option>
+                <option value="5">Example 5</option>
+                <option value="6">Example 6</option>
+            </select>
+            <div class="grid sm:grid-cols-2 gap-4">
                 <div>
-                    <label for="query1" class="block text-gray-700 text-sm font-medium mb-2">Query 1</label>
-                    <textarea x-model="query1" id="query1" name="query1" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
+                    <label for="query1" class="block text-lg font-semibold mb-2">Query 1</label>
+                    <textarea x-model="query1" id="query1" name="query1" class="textarea textarea-bordered w-full p-5 font-mono placeholder-slate-500" rows="6" placeholder="Type a custom query or choose an example..."></textarea>
                 </div>
                 <div>
-                    <label for="query2" class="block text-gray-700 text-sm font-medium mb-2">Query 2</label>
-                    <textarea x-model="query2" id="query2" name="query2" class="w-full p-2 border border-gray-300 rounded" rows="6"></textarea>
+                    <label for="query2" class="block text-lg font-semibold mb-2">Query 2</label>
+                    <textarea x-model="query2" id="query2" name="query2" class="textarea textarea-bordered w-full p-5 font-mono placeholder-slate-500" rows="6" placeholder="Type a custom query or choose an example..."></textarea>
                 </div>
             </div>
-            <button @click.prevent="handleSubmit" class="bg-indigo-500 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded">Submit</button>
+            <div class="flex gap-2">
+                <button @click.prevent="handleSubmit" class="btn btn-primary">Get Query Plans</button>
+                <button @click.prevent="resetQueries" class="btn btn-secondary">Reset Queries</button>
+            </div>
         </form>
-        <div class="mt-8 bg-white p-4 rounded border border-gray-300">
-            <h2 class="text-xl font-semibold mb-4">Difference in the queries</h2>
-            <p x-text="diff" class="text-gray-700"></p>
-        </div>
-        <div class="grid sm:grid-cols-2 gap-4">
-            <div class="mt-8 bg-white p-4 rounded border border-gray-300">
-                <h2 class="text-xl font-semibold mb-4">Operations in Query 1 & not in Query 2</h2>
-                <p x-text="query1Plan" class="text-gray-700"></p>
+        <div>
+            <div class="bg-base-300 p-5 rounded border border-base-content border-opacity-20">
+                <h2 class="text-lg font-semibold mb-2">Difference in the queries</h2>
+                <ul x-show="diff.length" class="list-disc list-inside">
+                    <template x-for="item in diff">
+                        <li x-text="item"></li>
+                    </template>
+                </ul>
+                <p x-show="!diff.length">
+                    -
+                </p>
             </div>
-            <div class="mt-8 bg-white p-4 rounded border border-gray-300">
-                <h2 class="text-xl font-semibold mb-4">Operations in Query 2 & not in Query 1</h2>
-                <p x-text="query2Plan" class="text-gray-700"></p>
+            <div class="flex flex-col lg:flex-row gap-4 w-full mt-4 lg:mt-6">
+                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
+                    <h2 class="text-lg font-semibold mb-2">Operations in Query 1 & not in Query 2</h2>
+                    <ul x-show="query1Plan.length" class="list-disc list-inside">
+                        <template x-for="item in query1Plan">
+                            <li x-text="item"></li>
+                        </template>
+                    </ul>
+                    <p x-show="!query1Plan.length">
+                        -
+                    </p>
+                </div>
+                <div class="hidden lg:flex divider divider-horizontal">vs</div>
+                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
+                    <h2 class="text-lg font-semibold mb-2">Operations in Query 2 & not in Query 1</h2>
+                    <ul x-show="query2Plan.length" class="list-disc list-inside">
+                        <template x-for="item in query2Plan">
+                            <li x-text="item"></li>
+                        </template>
+                    </ul>
+                    <p x-show="!query2Plan.length">
+                        -
+                    </p>
+                </div>
             </div>
         </div>
     </div>
 </body>
 <script>
-    const sample_query1 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316' LIMIT 100"
-    const sample_query2 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316';"
-
     function getData() {
         return { 
-            query1: sample_query1,
-            query2: sample_query2,
-            diff: '-',
-            query1Plan: '-',
-            query2Plan: '-',
+            query1: '',
+            query2: '',
+            exampleQuery: '',
+            diff: [],
+            query1Plan: [],
+            query2Plan: [],
             handleSubmit() {
                 const res = fetch(`{{ url_for('compare') }}`, {
                     method: 'POST',
@@ -62,15 +96,54 @@
                     })
                 }).then(res => {
                     if (res.status !== 200) {
-                        throw new Error("Error submitting form")
+                        throw new Error("Error getting query plans. Please check your input")
                     } else {
                         return res.json()
                     }
                 }).then(data => {
-                    this.query1Plan = data.query1Plan.length === 0 ? '-' : data.query1Plan
-                    this.query2Plan = data.query2Plan.length === 0 ? '-' : data.query2Plan
-                    this.diff = data.diff.length === 0 ? '-' : data.diff
+                    this.query1Plan = data.query1Plan
+                    this.query2Plan = data.query2Plan
+                    this.diff = data.diff
                 })
+            },
+            updateQueries() {
+                switch (this.exampleQuery) {
+                    case "1":
+                        this.query1 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316' LIMIT 100"
+                        this.query2 = "select c.c_name, o.o_orderkey, n.n_name from customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316';" 
+                        break
+                    case "2":
+                        this.query1 = "select * from customer c, nation n where n.n_nationkey = c.c_nationkey order by c_nationkey asc"
+                        this.query2 = "select c.c_name from customer c, nation n where n.n_nationkey = c.c_nationkey order by c_nationkey asc"
+                        break
+                    case "3":
+                        this.query1 = "select c_name, o_comment from customer inner join orders on c_custkey = o_orderkey;"
+                        this.query2 = "select c_name, o_comment from customer inner join orders on c_custkey = o_custkey;"
+                        break
+                    case "4":
+                        this.query1 = "SELECT c.c_name, o.o_orderkey, n.n_name FROM customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316';"
+                        this.query2 = "SELECT c.c_name, o.o_orderkey, n.n_name FROM customer c INNER JOIN orders o ON c.c_custkey = o.o_custkey INNER JOIN nation n ON c.c_nationkey = n.n_nationkey WHERE c.c_name = 'Customer#000000316' AND o.o_orderpriority = '1-URGENT';"
+                        break
+                    case "5":
+                        this.query1 = "select * from customer c where c.c_name = 'Customer#000000316'"
+                        this.query2 = "select * from customer c"
+                        break
+                    case "6":
+                        this.query1 = "SELECT sum(C.c_acctbal) FROM customer AS c, nation AS n WHERE c.c_nationkey = n.n_nationkey AND n.n_name = 'INDIA'"
+                        this.query2 = "SELECT sum(C.c_acctbal) FROM customer AS c, nation AS n WHERE c.c_nationkey = n.n_nationkey AND n.n_name = 'ARGENTINA'"
+                        break
+                    default:
+                        this.query1 = ''
+                        this.query2 = ''
+                }
+            },
+            resetQueries() {
+                this.query1 = ''
+                this.query2 = ''
+                this.exampleQuery = ''
+                this.diff = []
+                this.query1Plan = []
+                this.query2Plan = []
             }
         }
     }

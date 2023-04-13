@@ -110,7 +110,8 @@ def CompareQueries(query1, query2):
     # traverse_qp_json_2(plan1, plan2)
     traverse_qp_json_1(plan1, plan1_ops)
     traverse_qp_json_1(plan2, plan2_ops)
-
+    plan1_full=plan1_ops
+    plan2_full=plan2_ops
     plan1_extras = [x for x in plan1_ops if x not in plan2_ops]
     plan2_extras = [x for x in plan2_ops if x not in plan1_ops]
 
@@ -178,4 +179,4 @@ def CompareQueries(query1, query2):
             diff_in_queries.append("'{q2}' has been added to the new query under the {clause} clause".format(q2 = q2_string, clause = q2_currClause))
 
 
-    return plan1_extras, plan2_extras, diff_in_queries
+    return plan1_extras, plan2_extras, diff_in_queries,plan1_full,plan2_full

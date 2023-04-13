@@ -91,7 +91,7 @@ def CompareQueries(query1, query2):
 
     plan1 = GetQueryPlan(query1)
     plan2 = GetQueryPlan(query2)
-
+    
     out1 = open("plan1_output.json", "w")
     out2 = open("plan2_output.json", "w")
     json.dump(plan1, out1, indent=2)
@@ -112,6 +112,19 @@ def CompareQueries(query1, query2):
     traverse_qp_json_1(plan2, plan2_ops)
     plan1_full=plan1_ops
     plan2_full=plan2_ops
+    for i in range(len(plan1_full)):
+        string=plan1_full[i]
+        for character in '():':
+            string=string.replace(character,'')
+        string=string.replace('text','')
+        plan1_full[i]=string
+    for i in range(len(plan2_full)):
+        string=plan2_full[i]
+        for character in '():':
+            string=string.replace(character,'')
+        string=string.replace('text','')
+        plan2_full[i]=string
+        
     plan1_extras = [x for x in plan1_ops if x not in plan2_ops]
     plan2_extras = [x for x in plan2_ops if x not in plan1_ops]
 

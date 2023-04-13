@@ -50,9 +50,9 @@ def compare():
 
     query1 = data['query1']
     query2 = data['query2']
-    query1Plan, query2Plan, diff = CompareQueries(query1, query2)
+    query1Plan, query2Plan, diff,query1Orig,query2Orig = CompareQueries(query1, query2)
 
-    return jsonify(query1Plan=query1Plan, query2Plan=query2Plan, diff=diff)
+    return jsonify(query1Plan=query1Plan, query2Plan=query2Plan, diff=diff,query1Orig=query1Orig,query2Orig=query2Orig)
 
 
 if __name__ == '__main__':

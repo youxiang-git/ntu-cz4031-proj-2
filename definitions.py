@@ -25,7 +25,7 @@ node_type_dict = {
     "Index Scan": "Index Scan on '{Relation Name}' as '{Alias}' on '{Index Name}' ",
     "Index Only Scan": "Index Only Scan on '{Relation Name}' as '{Alias}' on '{Index Name}' ",
     "Merge Join": "{Join Type}-Merge Join on {Merge Cond}",
-    "Bitmap Heap Scan": "Bitmap Heap Scan on '{Relation Name}' as '{Alias}' with {Recheck Condition} ",
+    "Bitmap Heap Scan": "Bitmap Heap Scan on '{Relation Name}' as '{Alias}' with {Recheck Cond} ",
     "Bitmap Index Scan": "Bitmap Index Scan on '{Index Name}' with {Index Cond}",
     "Sort": "Sorted on '{Sort Key}'",
 }

@@ -38,63 +38,64 @@
         <div>
             <div class="bg-base-300 p-5 rounded border border-base-content border-opacity-20">
                 <h2 class="text-lg font-semibold mb-2">Difference in the queries</h2>
-                <ul x-show="diff.length" class="list-disc list-inside">
+                <ol x-show="diff.length" class="list-decimal list-inside">
                     <template x-for="item in diff">
                         <li x-text="item"></li>
                     </template>
-                </ul>
+                </ol>
                 <p x-show="!diff.length">
                     -
                 </p>
             </div>
-            <div class="flex flex-col lg:flex-row gap-4 w-full mt-4 lg:mt-6">
-                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
-                    <h2 class="text-lg font-semibold mb-2">Operations in Query 1 & not in Query 2</h2>
-                    <ul x-show="query1Plan.length" class="list-disc list-inside">
-                        <template x-for="item in query1Plan">
-                            <li x-text="item"></li>
-                        </template>
-                    </ul>
-                    <p x-show="!query1Plan.length">
-                        -
-                    </p>
+            <div class="flex flex-col lg:flex-row gap-4 w-full mt-4">
+                <div class="flex-1">
+                    <div class="bg-base-300 p-5 mb-4 rounded border border-base-content border-opacity-20">
+                        <h2 class="text-lg font-semibold mb-2">QEP 1</h2>
+                        <ol x-show="qep1.length" class="list-decimal list-inside">
+                            <template x-for="item in qep1">
+                                <li x-text="item"></li>
+                            </template>
+                        </ol>
+                        <p x-show="!qep1.length">
+                            -
+                        </p>
+                    </div>
+                    <div class="bg-base-300 p-5 rounded border border-base-content border-opacity-20">
+                        <h2 class="text-lg font-semibold mb-2">Operations in QEP 1 & not in QEP 2</h2>
+                        <ol x-show="qep1diff.length" class="list-decimal list-inside">
+                            <template x-for="item in qep1diff">
+                                <li x-text="item"></li>
+                            </template>
+                        </ol>
+                        <p x-show="!qep1diff.length">
+                            -
+                        </p>
+                    </div>
                 </div>
                 <div class="hidden lg:flex divider divider-horizontal">vs</div>
-                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
-                    <h2 class="text-lg font-semibold mb-2">Operations in Query 2 & not in Query 1</h2>
-                    <ul x-show="query2Plan.length" class="list-disc list-inside">
-                        <template x-for="item in query2Plan">
-                            <li x-text="item"></li>
-                        </template>
-                    </ul>
-                    <p x-show="!query2Plan.length">
-                        -
-                    </p>
-                </div>
-            </div>
-             <div class="flex flex-col lg:flex-row gap-4 w-full mt-4 lg:mt-6">
-                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
-                    <h2 class="text-lg font-semibold mb-2">Description of Query </h2>
-                    <ul x-show="query1Orig.length" class="list-disc list-inside">
-                        <template x-for="item in query1Orig">
-                            <li x-text="item"></li>
-                        </template>
-                    </ul>
-                    <p x-show="!query1Orig.length">
-                        -
-                    </p>
-                </div>
-                <div class="hidden lg:flex divider divider-horizontal">vs</div>
-                <div class="flex-1 bg-base-300 p-5 rounded border border-base-content border-opacity-20">
-                    <h2 class="text-lg font-semibold mb-2">Description of Query 2 </h2>
-                    <ul x-show="query2orig.length" class="list-disc list-inside">
-                        <template x-for="item in query2Orig">
-                            <li x-text="item"></li>
-                        </template>
-                    </ul>
-                    <p x-show="!query2Orig.length">
-                        -
-                    </p>
+                <div class="flex-1">
+                    <div class="bg-base-300 p-5 mb-4 rounded border border-base-content border-opacity-20">
+                        <h2 class="text-lg font-semibold mb-2">QEP 2</h2>
+                        <ol x-show="qep2.length" class="list-decimal list-inside">
+                            <template x-for="item in qep2">
+                                <li x-text="item"></li>
+                            </template>
+                        </ol>
+                        <p x-show="!qep2.length">
+                            -
+                        </p>
+                    </div>
+                    <div class="bg-base-300 p-5 rounded border border-base-content border-opacity-20">
+                        <h2 class="text-lg font-semibold mb-2">Operations in QEP 2 & not in QEP 1</h2>
+                        <ol x-show="qep2diff.length" class="list-decimal list-inside">
+                            <template x-for="item in qep2diff">
+                                <li x-text="item"></li>
+                            </template>
+                        </ol>
+                        <p x-show="!qep2diff.length">
+                            -
+                        </p>
+                    </div>
                 </div>
             </div>
         </div>
@@ -107,8 +108,10 @@
             query2: '',
             exampleQuery: '',
             diff: [],
-            query1Plan: [],
-            query2Plan: [],
+            qep1: [],
+            qep2: [],
+            qep1diff: [],
+            qep2diff: [],
             handleSubmit() {
                 const res = fetch(`{{ url_for('compare') }}`, {
                     method: 'POST',
@@ -126,8 +129,10 @@
                         return res.json()
                     }
                 }).then(data => {
-                    this.query1Plan = data.query1Plan
-                    this.query2Plan = data.query2Plan
+                    this.qep1 = data.qep1
+                    this.qep2 = data.qep2
+                    this.qep1diff = data.qep1diff
+                    this.qep2diff = data.qep2diff
                     this.diff = data.diff
                 })
             },
@@ -167,8 +172,10 @@
                 this.query2 = ''
                 this.exampleQuery = ''
                 this.diff = []
-                this.query1Plan = []
-                this.query2Plan = []
+                this.qep1 = []
+                this.qep2 = []
+                this.qep1diff = []
+                this.qep2diff = []
             }
         }
     }

@@ -2485,6 +2485,10 @@ html {
   margin-bottom: 0.5rem;
 }
 
+.mb-4 {
+  margin-bottom: 1rem;
+}
+
 .mb-8 {
   margin-bottom: 2rem;
 }
@@ -2525,8 +2529,8 @@ html {
   list-style-position: inside;
 }
 
-.list-disc {
-  list-style-type: disc;
+.list-decimal {
+  list-style-type: decimal;
 }
 
 .flex-col {
@@ -2621,10 +2625,6 @@ html {
 }
 
 @media (min-width: 1024px) {
-  .lg\:mt-6 {
-    margin-top: 1.5rem;
-  }
-
   .lg\:flex {
     display: flex;
   }

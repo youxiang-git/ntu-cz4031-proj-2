@@ -5,6 +5,7 @@ import re
 import sqlparse
 from definitions import *
 
+
 def StartDBConnection():
     conn = None
     # Connect to your postgres DB
@@ -35,6 +36,8 @@ def print_query_plan(plan):
 # this function traverses one query plan and prints all the additional "Node Type"s
 # used when one tree is longer than the other for whatever reason
 # eg. one query is a lot shorter than the other
+
+
 def traverse_qp_json_1(plan, plan_operations):
     if "Plans" in plan:
         if isinstance(plan["Plans"], dict):
@@ -42,7 +45,7 @@ def traverse_qp_json_1(plan, plan_operations):
         elif isinstance(plan["Plans"], list):
             for i in reversed(range(len(plan["Plans"]))):
                 traverse_qp_json_1(plan["Plans"][i], plan_operations)
-    
+
     if "Node Type" in plan:
         output = ""
         curr_node_type = plan["Node Type"]
@@ -52,10 +55,11 @@ def traverse_qp_json_1(plan, plan_operations):
             if "Filter" in plan:
                 output = output + ", filtered on {}".format(plan["Filter"])
             elif "Join Filter" in plan:
-                output = output + ", join filtered on {}".format(plan["Join Filter"])
+                output = output + \
+                    ", join filtered on {}".format(plan["Join Filter"])
 
             plan_operations.append(output)
-        else: 
+        else:
             plan_operations.append(plan["Node Type"])
 
 # this function traverses both query plans at the same time and finds differences in "Node Type"
@@ -84,14 +88,12 @@ def traverse_qp_json_1(plan, plan_operations):
 
 def CompareQueries(query1, query2):
     if query1 == query2:
-        print(
-            "There are no differences between the SQL queries, please check your input."
-        )
-        return
+        print('There are no differences between the SQL queries, please check your input.')
+        return [], [], [], [], [], 'There are no differences between the SQL queries, please check your input.'
 
     plan1 = GetQueryPlan(query1)
     plan2 = GetQueryPlan(query2)
-    
+
     out1 = open("plan1_output.json", "w")
     out2 = open("plan2_output.json", "w")
     json.dump(plan1, out1, indent=2)
@@ -101,8 +103,8 @@ def CompareQueries(query1, query2):
 
     # check if the plans are the same
     if plan1 == plan2:
-        print("The provided queries have the same query plan.")
-        return
+        print('The provided queries have the same query plan.')
+        return [], [], [], [], [], 'The provided queries have the same query plan.'
 
     plan1_ops = []
     plan2_ops = []
@@ -110,21 +112,21 @@ def CompareQueries(query1, query2):
     # traverse_qp_json_2(plan1, plan2)
     traverse_qp_json_1(plan1, plan1_ops)
     traverse_qp_json_1(plan2, plan2_ops)
-    plan1_full=plan1_ops
-    plan2_full=plan2_ops
+    plan1_full = plan1_ops
+    plan2_full = plan2_ops
     for i in range(len(plan1_full)):
-        string=plan1_full[i]
+        string = plan1_full[i]
         for character in '():':
-            string=string.replace(character,'')
-        string=string.replace('text','')
-        plan1_full[i]=string
+            string = string.replace(character, '')
+        string = string.replace('text', '')
+        plan1_full[i] = string
     for i in range(len(plan2_full)):
-        string=plan2_full[i]
+        string = plan2_full[i]
         for character in '():':
-            string=string.replace(character,'')
-        string=string.replace('text','')
-        plan2_full[i]=string
-        
+            string = string.replace(character, '')
+        string = string.replace('text', '')
+        plan2_full[i] = string
+
     plan1_extras = [x for x in plan1_ops if x not in plan2_ops]
     plan2_extras = [x for x in plan2_ops if x not in plan1_ops]
 
@@ -156,7 +158,7 @@ def CompareQueries(query1, query2):
             for nt in t.tokens:
                 if nt.ttype is sqlparse.tokens.Keyword:
                     q2_keywords.append(nt.value)
-        
+
     q1 = re.sub(r'[,;]', '', q1)
     q2 = re.sub(r'[,;]', '', q2)
     q1 = q1.split()
@@ -177,19 +179,21 @@ def CompareQueries(query1, query2):
             if item in ' '.join(q2[j1:j2]):
                 q2_currClause = item
         if op == 'replace':
-            diff_in_queries.append("'{q1}' has been modified to '{q2}' under the {clause} clause".format(q1 = ' '.join(q1[i1:i2]), q2 = ' '.join(q2[j1:j2]), clause = q1_currClause))
+            diff_in_queries.append("'{q1}' has been modified to '{q2}' under the {clause} clause".format(
+                q1=' '.join(q1[i1:i2]), q2=' '.join(q2[j1:j2]), clause=q1_currClause))
 
         elif op == 'delete':
             q1_string = ' '.join(q1[i1:i2])
             if q1_currClause in q1_string:
                 q1_string = q1_string.replace(q1_currClause, '').strip()
-            diff_in_queries.append("'{q1}' under the {clause} clause in original query, has been removed".format(q1 = q1_string, clause = q1_currClause))
-            
+            diff_in_queries.append("'{q1}' under the {clause} clause in original query, has been removed".format(
+                q1=q1_string, clause=q1_currClause))
+
         elif op == 'insert':
             q2_string = ' '.join(q2[j1:j2])
             if q2_currClause in q2_string:
                 q2_string = q2_string.replace(q2_currClause, '').strip()
-            diff_in_queries.append("'{q2}' has been added to the new query under the {clause} clause".format(q2 = q2_string, clause = q2_currClause))
+            diff_in_queries.append("'{q2}' has been added to the new query under the {clause} clause".format(
+                q2=q2_string, clause=q2_currClause))
 
-
-    return plan1_extras, plan2_extras, diff_in_queries,plan1_full,plan2_full
+    return plan1_extras, plan2_extras, diff_in_queries, plan1_full, plan2_full, ''

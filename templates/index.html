@@ -34,8 +34,14 @@
                 <button @click.prevent="handleSubmit" class="btn btn-primary">Get Query Plans</button>
                 <button @click.prevent="resetQueries" class="btn btn-secondary">Reset Queries</button>
             </div>
+            <div x-show="error.length" class="alert alert-error shadow-lg">
+                <div>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current flex-shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                  <span x-text="error"></span>
+                </div>
+              </div>
+            <div>
         </form>
-        <div>
             <div class="bg-base-300 p-5 rounded border border-base-content border-opacity-20">
                 <h2 class="text-lg font-semibold mb-2">Difference in the queries</h2>
                 <ol x-show="diff.length" class="list-decimal list-inside">
@@ -112,6 +118,7 @@
             qep2: [],
             qep1diff: [],
             qep2diff: [],
+            error: '',
             handleSubmit() {
                 const res = fetch(`{{ url_for('compare') }}`, {
                     method: 'POST',
@@ -134,6 +141,7 @@
                     this.qep1diff = data.qep1diff
                     this.qep2diff = data.qep2diff
                     this.diff = data.diff
+                    this.error = data.error
                 })
             },
             updateQueries() {
@@ -176,6 +184,7 @@
                 this.qep2 = []
                 this.qep1diff = []
                 this.qep2diff = []
+                this.error = ''
             }
         }
     }
